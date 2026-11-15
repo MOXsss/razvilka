@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Развилка</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+background:#0e1116;color:#e8ecf1;min-height:100vh;font-size:16px}
+#app{max-width:520px;margin:0 auto;padding:16px 16px 110px}
+h1{font-size:26px;margin:8px 0 4px;letter-spacing:-.5px}
+h2{font-size:19px;margin:0 0 12px}
+.sub{color:#8b97a8;font-size:14px;margin-bottom:18px;line-height:1.45}
+.btn{display:block;width:100%;padding:16px;border-radius:14px;border:none;
+background:#2a3446;color:#e8ecf1;font-size:16px;font-weight:600;margin-top:10px;cursor:pointer;
+font-family:inherit;transition:transform .08s}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:#3d7eff;color:#fff}
+.btn.danger{background:#c0392b}
+.btn.ghost{background:transparent;border:1px solid #2f3a4d;color:#8b97a8;font-weight:500}
+.btn:disabled{opacity:.35}
+.card{background:#161c26;border:1px solid #232d3d;border-radius:16px;padding:14px;margin-top:12px;
+transition:border-color .15s,transform .08s}
+.card.sel{border-color:#3d7eff;transform:scale(.99)}
+.card-row{display:flex;gap:12px;align-items:flex-start}
+.card-icon{width:64px;height:64px;flex-shrink:0;border-radius:14px;
+display:flex;align-items:center;justify-content:center;background:#0a0e16;border:1px solid #232d3d}
+.card-body{flex:1;min-width:0}
+.card .ttl{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#7a879c;margin-bottom:6px}
+.card .txt{font-size:15px;line-height:1.4}
+.card .tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;margin-top:10px;font-weight:700}
+.hdr{display:flex;gap:6px;align-items:center;margin-bottom:14px;font-size:12px;color:#8b97a8;flex-wrap:wrap}
+.hdr .pill{background:#1a2230;padding:5px 9px;border-radius:20px;white-space:nowrap}
+.hdr .sp{flex:1}
+.big{font-size:22px;font-weight:700;margin:24px 0 8px;text-align:center}
+.center{text-align:center}
+.opt{display:flex;width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid #232d3d;
+background:#161c26;color:#e8ecf1;font-size:15px;margin-top:8px;cursor:pointer;font-family:inherit;
+gap:10px;align-items:center}
+.opt.sel{border-color:#3d7eff;background:#1b2a44}
+.opt.ok{border-color:#27ae60;background:#12291c}
+.opt.no{border-color:#c0392b;background:#2a1414}
+.opt-col{display:flex;flex-direction:column;align-items:flex-start;flex:1}
+.q{font-weight:600;margin-top:22px;font-size:16px}
+.scale{display:flex;gap:8px;margin-top:14px}
+.scale div{flex:1;text-align:center;padding:10px 4px;border-radius:12px;background:#161c26;border:1px solid #232d3d}
+.scale .n{font-size:20px;font-weight:700}
+.scale .l{font-size:10px;color:#8b97a8;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.modal{position:fixed;inset:0;background:rgba(8,11,16,.94);overflow-y:auto;padding:20px;z-index:50}
+.modal .inner{max-width:520px;margin:0 auto;padding-bottom:40px}
+.mcard{background:#161c26;border-radius:12px;padding:12px 14px;margin-top:8px;font-size:14px;line-height:1.4;border-left:3px solid #333;display:flex;gap:10px;align-items:center}
+.mcard-body{flex:1;min-width:0}
+.inp{width:100%;padding:14px;border-radius:12px;border:1px solid #232d3d;background:#161c26;
+color:#e8ecf1;font-size:16px;margin-top:8px;font-family:inherit}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#3d7eff;color:#fff;
+padding:12px 22px;border-radius:30px;font-size:14px;font-weight:600;z-index:99;opacity:0;transition:opacity .2s;
+max-width:80%;text-align:center}
+.toast.on{opacity:1}
+.win{font-size:56px;text-align:center;margin:20px 0}
+.code-big{font-size:42px;font-weight:800;letter-spacing:8px;text-align:center;color:#3d7eff;
+margin:12px 0;font-family:'Courier New',monospace;user-select:all}
+.spinner{display:inline-block;width:24px;height:24px;border:3px solid #2f3a4d;
+border-top-color:#3d7eff;border-radius:50%;animation:spin 1s linear infinite;vertical-align:middle;margin-right:10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.player-row{display:flex;align-items:center;padding:8px 12px;background:#161c26;border-radius:12px;margin-top:6px;gap:10px}
+.player-row .dot{width:8px;height:8px;border-radius:50%;background:#27ae60;flex-shrink:0}
+.player-row .dot.off{background:#5a6678}
+.player-row .nm{flex:1}
+.player-row .host-badge{font-size:11px;color:#3d7eff;font-weight:700}
+.you-badge{font-size:11px;color:#e0b14a;margin-left:6px;font-weight:700}
+#qr-box{display:flex;justify-content:center;padding:16px;background:#fff;border-radius:16px;margin:14px 0}
+#qr-box img,#qr-box canvas{border-radius:8px;display:block}
+.qr-hint{text-align:center;font-size:13px;color:#8b97a8;margin-top:8px;line-height:1.5}
+.mode-btn{display:flex;gap:14px;align-items:center;text-align:left;padding:18px;line-height:1.4}
+.mode-btn .icon{font-size:32px;flex-shrink:0}
+.invite-card{background:linear-gradient(135deg,#1b2a44 0%,#161c26 100%);border:1px solid #3d7eff;border-radius:16px;
+padding:22px;margin:16px 0;text-align:center}
+.invite-card .code{font-size:32px;font-weight:800;letter-spacing:6px;color:#3d7eff;
+font-family:'Courier New',monospace;margin:10px 0 4px}
+.theme-hero{height:120px;border-radius:14px;overflow:hidden;margin-bottom:14px;position:relative;
+border:1px solid #232d3d}
+.theme-hero svg{display:block;width:100%;height:100%}
+.opt-thumb{width:56px;height:32px;border-radius:6px;overflow:hidden;flex-shrink:0;border:1px solid #232d3d}
+.opt-thumb svg{display:block;width:100%;height:100%}
+.truth-portrait{display:flex;gap:14px;align-items:center;margin-top:10px}
+.truth-portrait .info{flex:1}
+</style>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ RNG ============ */
+function makeRNG(seed){
+  let s=seed>>>0;
+  return {
+    next(){ s=(s+0x6D2B79F5)>>>0; let t=s; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61);
+      return ((t^(t>>>14))>>>0)/4294967296; },
+    int(n){ return Math.floor(this.next()*n); },
+    pick(a){ return a[this.int(a.length)]; },
+    shuffle(a){ const b=a.slice(); for(let i=b.length-1;i>0;i--){ const j=this.int(i+1); [b[i],b[j]]=[b[j],b[i]]; } return b; }
+  };
+}
+
+/* ============ GRAPHICS (procedural SVG) ============ */
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=((h<<5)-h+s.charCodeAt(i))|0; } return Math.abs(h); }
+
+const SKIN=['#f2c9a0','#e0ac80','#c68863','#8d5524','#f5d0b0','#dba378'];
+const HAIR=['#2b1a11','#4a2c1a','#7a4a23','#a86a3a','#1a1a1a','#c9c9c9','#8b3a1e','#5a4a3a'];
+const SHIRT=['#3d7eff','#2ecc71','#e74c3c','#f39c12','#9b59b6','#16a085','#34495e','#e67e22','#c0392b','#7f8c8d'];
+const THEME_BG={hotel:'#1b2a44',space:'#141c3a',theatre:'#3a1a2e',university:'#1a2a1a',village:'#2a1a10',corp:'#1a1a2a'};
+
+function svgPortrait(name, themeId, size){
+  size=size||64;
+  const h=hashStr(name);
+  const skin=SKIN[h%SKIN.length];
+  const hair=HAIR[(h>>4)%HAIR.length];
+  const shirt=SHIRT[(h>>8)%SHIRT.length];
+  const style=(h>>12)%4;
+  const bg=THEME_BG[themeId]||'#1a2230';
+
+  let hairSVG='';
+  if(style===0){
+    hairSVG=`<path d="M23 34 Q23 18 40 18 Q57 18 57 34 Q57 28 40 28 Q23 28 23 34 Z" fill="${hair}"/>`;
+  } else if(style===1){
+    hairSVG=`<rect x="22" y="34" width="7" height="28" rx="3" fill="${hair}"/>
+             <rect x="51" y="34" width="7" height="28" rx="3" fill="${hair}"/>
+             <path d="M23 34 Q23 18 40 18 Q57 18 57 34 Q57 28 40 28 Q23 28 23 34 Z" fill="${hair}"/>`;
+  } else if(style===2){
+    hairSVG=`<circle cx="40" cy="14" r="7" fill="${hair}"/>
+             <path d="M23 34 Q23 18 40 18 Q57 18 57 34 Q57 28 40 28 Q23 28 23 34 Z" fill="${hair}"/>`;
+  } else {
+    hairSVG=`<ellipse cx="40" cy="22" rx="17" ry="5" fill="${hair}"/>`;
+  }
+
+  return `<svg viewBox="0 0 80 80" width="${size}" height="${size}" style="border-radius:50%;background:${bg};display:block;flex-shrink:0">
+    <circle cx="40" cy="38" r="16" fill="${skin}"/>
+    ${hairSVG}
+    <circle cx="34" cy="37" r="1.6" fill="#0e1116"/>
+    <circle cx="46" cy="37" r="1.6" fill="#0e1116"/>
+    <path d="M35 45 Q40 49 45 45" fill="none" stroke="#3a1a10" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M20 80 Q20 58 40 58 Q60 58 60 80 Z" fill="${shirt}"/>
+  </svg>`;
+}
+
+function cardIconKind(card){
+  const t=card.title.toLowerCase();
+  if(t.includes('отпечат')||t.includes('следы')) return 'fingerprint';
+  if(t.includes('записк')||t.includes('письм')||t.includes('угроз')) return 'letter';
+  if(t.includes('мест')||t.includes('дверь')||t.includes('фото')) return 'pin';
+  if(t.includes('мотив')||t.includes('дневник')) return 'book';
+  if(t.includes('свидетел')||t.includes('похож')||t.includes('показан')) return 'witness';
+  if(t.includes('ключ')||t.includes('взлом')) return 'key';
+  if(t.includes('ложн')||t.includes('сплетн')||t.includes('слух')) return 'eyeoff';
+  if(t.includes('телефон')||t.includes('наблюд')||t.includes('звонок')) return 'phone';
+  if(t.includes('квитанц')||t.includes('сумм')||t.includes('страхов')||t.includes('долг')||t.includes('перевод')||t.includes('книга')||t.includes('контор')) return 'money';
+  if(t.includes('пепел')||t.includes('пожар')) return 'fire';
+  if(t.includes('сейф')) return 'safe';
+  if(t.includes('чашк')||t.includes('бокал')) return 'cup';
+  if(t.includes('вход')||t.includes('отъезд')) return 'exit';
+  if(t.includes('заключен')||t.includes('странность')||t.includes('деталь')) return 'magnifier';
+  return 'magnifier';
+}
+
+function svgIcon(kind, color){
+  const c=color||'#e8ecf1';
+  const P={
+    fingerprint:`<path d="M32 48 Q50 18 68 48" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M38 52 Q50 30 62 52" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M44 56 Q50 44 56 56" fill="none" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>`,
+    letter:`<rect x="22" y="22" width="56" height="38" rx="4" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <path d="M22 25 L50 45 L78 25" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>`,
+    magnifier:`<circle cx="44" cy="32" r="15" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <line x1="55" y1="43" x2="72" y2="60" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`,
+    pin:`<path d="M50 16 C40 16 32 24 32 34 C32 48 50 62 50 62 C50 62 68 48 68 34 C68 24 60 16 50 16 Z" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="50" cy="34" r="6" fill="${c}"/>`,
+    book:`<path d="M28 20 L50 26 L50 60 L28 54 Z" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M72 20 L50 26 L50 60 L72 54 Z" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>`,
+    witness:`<circle cx="36" cy="28" r="9" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <path d="M22 60 Q22 44 36 44 Q50 44 50 60" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <rect x="56" y="18" width="28" height="20" rx="4" fill="none" stroke="${c}" stroke-width="2"/>
+      <path d="M62 38 L66 46 L70 38" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round"/>`,
+    key:`<circle cx="34" cy="38" r="11" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <line x1="45" y1="38" x2="74" y2="38" stroke="${c}" stroke-width="2.5"/>
+      <line x1="66" y1="38" x2="66" y2="52" stroke="${c}" stroke-width="2.5"/>
+      <line x1="74" y1="38" x2="74" y2="48" stroke="${c}" stroke-width="2.5"/>`,
+    eyeoff:`<path d="M20 38 Q50 16 80 38 Q50 60 20 38 Z" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>
+      <circle cx="50" cy="38" r="7" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <line x1="22" y1="58" x2="78" y2="18" stroke="#e07a6a" stroke-width="3" stroke-linecap="round"/>`,
+    phone:`<rect x="36" y="16" width="28" height="48" rx="5" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <line x1="44" y1="58" x2="56" y2="58" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>`,
+    money:`<rect x="20" y="24" width="60" height="34" rx="4" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <circle cx="50" cy="41" r="8" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <line x1="26" y1="30" x2="26" y2="52" stroke="${c}" stroke-width="2"/>
+      <line x1="74" y1="30" x2="74" y2="52" stroke="${c}" stroke-width="2"/>`,
+    fire:`<path d="M50 14 C42 26 38 32 42 44 C44 50 48 54 50 56 C50 56 52 52 54 48 C58 54 56 40 56 40 C62 34 56 26 50 14 Z" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M46 54 Q42 48 46 42" fill="none" stroke="${c}" stroke-width="1.5" stroke-linecap="round"/>`,
+    safe:`<rect x="24" y="18" width="52" height="46" rx="4" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <circle cx="50" cy="41" r="11" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <line x1="50" y1="34" x2="50" y2="41" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="32" cy="30" r="1.5" fill="${c}"/>
+      <circle cx="32" cy="52" r="1.5" fill="${c}"/>`,
+    cup:`<path d="M28 26 L28 52 Q28 60 36 60 L58 60 Q66 60 66 52 L66 26 Z" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M66 34 L76 34 Q80 34 80 42 Q80 50 76 50 L66 50" fill="none" stroke="${c}" stroke-width="2.5"/>`,
+    exit:`<rect x="28" y="18" width="28" height="46" fill="none" stroke="${c}" stroke-width="2.5"/>
+      <line x1="58" y1="41" x2="78" y2="41" stroke="${c}" stroke-width="2.5"/>
+      <path d="M70 33 L78 41 L70 49" fill="none" stroke="${c}" stroke-width="2.5" stroke-linejoin="round"/>`
+  };
+  return `<svg viewBox="0 0 100 70" width="56" height="56" style="display:block">${P[kind]||P.magnifier}</svg>`;
+}
+
+function svgCardIllustration(card){
+  return svgIcon(cardIconKind(card), SC[card.scale]);
+}
+
+function svgThemeScene(themeId){
+  const scenes={
+    hotel:`<svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">
+      <rect width="200" height="100" fill="#0a0e1a"/>
+      <circle cx="165" cy="22" r="9" fill="#f5e2a0"/>
+      <circle cx="161" cy="20" r="9" fill="#0a0e1a"/>
+      <g fill="#fff" opacity="0.7"><circle cx="30" cy="15" r="0.8"/><circle cx="60" cy="25" r="0.6"/><circle cx="120" cy="12" r="0.7"/><circle cx="140" cy="30" r="0.5"/></g>
+      <rect x="55" y="35" width="90" height="65" fill="#1a2740"/>
+      <path d="M50 35 L100 20 L150 35 Z" fill="#2a3446"/>
+      <g fill="#f5e2a0" opacity="0.85">
+        <rect x="65" y="45" width="10" height="10"/><rect x="80" y="45" width="10" height="10"/>
+        <rect x="110" y="45" width="10" height="10"/><rect x="125" y="45" width="10" height="10"/>
+        <rect x="65" y="60" width="10" height="10"/><rect x="80" y="60" width="10" height="10"/>
+        <rect x="110" y="60" width="10" height="10"/><rect x="125" y="60" width="10" height="10"/>
+      </g>
+      <rect x="92" y="78" width="16" height="22" fill="#e0b14a"/>
+    </svg>`,
+    space:`<svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">
+      <rect width="200" height="100" fill="#050814"/>
+      <g fill="#fff">
+        <circle cx="30" cy="20" r="0.8"/><circle cx="80" cy="15" r="0.6"/><circle cx="140" cy="25" r="0.9"/>
+        <circle cx="180" cy="15" r="0.7"/><circle cx="60" cy="45" r="0.5"/><circle cx="110" cy="55" r="0.7"/>
+        <circle cx="170" cy="65" r="0.6"/><circle cx="20" cy="70" r="0.7"/><circle cx="50" cy="85" r="0.6"/>
+      </g>
+      <circle cx="165" cy="70" r="25" fill="#3a4a7a" opacity="0.35"/>
+      <circle cx="165" cy="70" r="20" fill="none" stroke="#5a6aa0" stroke-width="0.7"/>
+      <ellipse cx="80" cy="78" rx="38" ry="20" fill="#1a2230"/>
+      <ellipse cx="80" cy="78" rx="38" ry="20" fill="none" stroke="#3d7eff" stroke-width="1.2"/>
+      <circle cx="80" cy="73" r="4" fill="#6aa8e0"/>
+      <line x1="80" y1="78" x2="55" y2="93" stroke="#3d7eff" stroke-width="1"/>
+      <line x1="80" y1="78" x2="105" y2="93" stroke="#3d7eff" stroke-width="1"/>
+    </svg>`,
+    theatre:`<svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">
+      <rect width="200" height="100" fill="#1a0a12"/>
+      <path d="M0 0 Q40 25 30 100 L0 100 Z" fill="#8b1a1a"/>
+      <path d="M200 0 Q160 25 170 100 L200 100 Z" fill="#8b1a1a"/>
+      <path d="M30 0 Q50 20 40 100 L30 100 Z" fill="#6b1010" opacity="0.6"/>
+      <path d="M170 0 Q150 20 160 100 L170 100 Z" fill="#6b1010" opacity="0.6"/>
+      <ellipse cx="100" cy="65" rx="70" ry="30" fill="#f5e2a0" opacity="0.06"/>
+      <ellipse cx="100" cy="58" rx="22" ry="28" fill="#f5e2a0"/>
+      <circle cx="92" cy="50" r="2.2" fill="#1a0a12"/>
+      <circle cx="108" cy="50" r="2.2" fill="#1a0a12"/>
+      <path d="M92 66 Q100 72 108 66" fill="none" stroke="#1a0a12" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>`,
+    university:`<svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">
+      <rect width="200" height="100" fill="#0a1a0a"/>
+      <circle cx="170" cy="20" r="8" fill="#e8e0c0" opacity="0.5"/>
+      <rect x="50" y="40" width="100" height="60" fill="#2a3a2a"/>
+      <path d="M40 40 L100 15 L160 40 Z" fill="#3a4a3a"/>
+      <g fill="#e0b14a" opacity="0.55">
+        <rect x="60" y="55" width="6" height="10"/><rect x="76" y="55" width="6" height="10"/>
+        <rect x="92" y="55" width="6" height="10"/><rect x="108" y="55" width="6" height="10"/>
+        <rect x="124" y="55" width="6" height="10"/><rect x="140" y="55" width="6" height="10"/>
+      </g>
+      <g fill="#8b9a8b">
+        <rect x="58" y="45" width="6" height="55"/>
+        <rect x="74" y="45" width="6" height="55"/>
+        <rect x="120" y="45" width="6" height="55"/>
+        <rect x="136" y="45" width="6" height="55"/>
+      </g>
+      <rect x="88" y="70" width="24" height="30" fill="#1a1a0a"/>
+    </svg>`,
+    village:`<svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">
+      <rect width="200" height="100" fill="#0a0a1a"/>
+      <circle cx="40" cy="25" r="10" fill="#f5e2a0"/>
+      <circle cx="36" cy="23" r="10" fill="#0a0a1a"/>
+      <rect x="70" y="55" width="50" height="40" fill="#3a2a1a"/>
+      <path d="M58 55 L95 28 L132 55 Z" fill="#5a3a2a"/>
+      <rect x="88" y="72" width="14" height="23" fill="#0e0a04"/>
+      <rect x="74" y="62" width="10" height="8" fill="#f5e2a0" opacity="0.85"/>
+      <rect x="106" y="62" width="10" height="8" fill="#f5e2a0" opacity="0.85"/>
+      <rect x="150" y="60" width="6" height="35" fill="#2a1a0a"/>
+      <circle cx="153" cy="55" r="16" fill="#1a3a1a"/>
+      <circle cx="149" cy="58" r="10" fill="#2a4a2a"/>
+    </svg>`,
+    corp:`<svg viewBox="0 0 200 100" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%">
+      <rect width="200" height="100" fill="#0a0a1a"/>
+      <circle cx="100" cy="75" r="45" fill="#c06030" opacity="0.28"/>
+      <g fill="#1a2230" stroke="#3d7eff" stroke-width="0.5">
+        <rect x="20" y="30" width="30" height="70"/>
+        <rect x="55" y="40" width="25" height="60"/>
+        <rect x="85" y="18" width="40" height="82"/>
+        <rect x="130" y="45" width="30" height="55"/>
+        <rect x="165" y="55" width="25" height="45"/>
+      </g>
+      <g fill="#6aa8e0" opacity="0.75">
+        <rect x="26" y="38" width="4" height="4"/><rect x="34" y="38" width="4" height="4"/>
+        <rect x="26" y="48" width="4" height="4"/><rect x="34" y="48" width="4" height="4"/>
+        <rect x="91" y="26" width="6" height="5"/><rect x="103" y="26" width="6" height="5"/><rect x="115" y="26" width="6" height="5"/>
+        <rect x="91" y="38" width="6" height="5"/><rect x="115" y="38" width="6" height="5"/>
+        <rect x="91" y="50" width="6" height="5"/><rect x="103" y="50" width="6" height="5"/><rect x="115" y="50" width="6" height="5"/>
+        <rect x="136" y="52" width="4" height="4"/><rect x="146" y="52" width="4" height="4"/>
+        <rect x="136" y="62" width="4" height="4"/>
+        <rect x="172" y="62" width="4" height="4"/><rect x="180" y="62" width="4" height="4"/>
+      </g>
+    </svg>`
+  };
+  return scenes[themeId]||scenes.hotel;
+}
+
+/* ============ THEMES ============ */
+const THEMES=[
+  {id:'hotel',name:'Отель «Меридиан»',emoji:'🏨',desc:'Классический детектив в старом отеле на берегу. Все под подозрением.',
+   suspects:[{name:'Виктор Кравцов',role:'управляющий отелем'},{name:'Лиза Морева',role:'журналистка'},{name:'Аркадий Сомов',role:'нотариус'},{name:'Нина Круг',role:'бывшая партнёрша'},{name:'Тимур Асланов',role:'охранник'},{name:'Ольга Пенн',role:'сестра жертвы'}],
+   motives:['Долг','Ревность','Наследство','Месть','Шантаж','Сокрытие тайны'],
+   methods:['Отравление','Подстроенный несчастный случай','Удар тяжёлым предметом','Удушение','Передозировка','Падение с высоты'],
+   places:['номер 302','подвал отеля','оранжерея','служебный вход','кабинет управляющего','крыша'],
+   firms:['Вектор','Тритон','Заря','Кедр','Меридиан','Атлас'],
+   photoPlaces:['на море','на чужой свадьбе','в институтском дворе','на крыше отеля']},
+  {id:'space',name:'Станция «Гелиос»',emoji:'🚀',desc:'Замкнутый космос. Среди шести человек на станции — убийца.',
+   suspects:[{name:'Командир Волков',role:'командир станции'},{name:'Инженер Соловьёва',role:'инженер систем'},{name:'Доктор Ким',role:'врач'},{name:'Пилот Рашид',role:'пилот шаттла'},{name:'Биолог Найт',role:'биолог'},{name:'Техник Орлов',role:'техник'}],
+   motives:['Саботаж','Ревность','Контрабанда','Месть','Сокрытие поломки','Борьба за место'],
+   methods:['Отключение кислорода','Подмена препарата','Удар в шлюзе','Электрический разряд','Отказ системы','Аварийный сброс'],
+   places:['реакторный отсек','каюта 7','медблок','шлюз','капитанский мостик','гидропоника'],
+   firms:['Кассиопея','Орион','Вега','Пульсар','Гелиос','Сириус'],
+   photoPlaces:['на выпуске академии','в терминале Марса','на старой станции «Мир»','в обсерватории']},
+  {id:'theatre',name:'Театр «Аквилон»',emoji:'🎭',desc:'Премьера обернулась трагедией. За кулисами у каждого свой мотив.',
+   suspects:[{name:'Режиссёр Вельский',role:'режиссёр'},{name:'Прима Соболева',role:'прима'},{name:'Осветитель Дрозд',role:'осветитель'},{name:'Драматург Ким',role:'драматург'},{name:'Костюмерша Пани',role:'костюмерша'},{name:'Спонсор Рыков',role:'спонсор'}],
+   motives:['Зависть','Ревность','Провал премьеры','Долг','Месть','Соперничество'],
+   methods:['Отравление в бокале','Падение с колосников','Удар штанкетом','Удушение шарфом','Подмена реквизита','Пожар за кулисами'],
+   places:['гримёрка примы','колосники','подвал сцены','репетиционный зал','кабинет режиссёра','зрительный балкон'],
+   firms:['Рампа','Софит','Занавес','Антракт','Аквилон','Премьера'],
+   photoPlaces:['на афише в Казани','на гастролях в Праге','за кулисами','на вручении премии']},
+  {id:'university',name:'Университет «Каменный мост»',emoji:'🎓',desc:'Академические интриги. В борьбе за грант все средства хороши.',
+   suspects:[{name:'Профессор Даль',role:'профессор'},{name:'Аспирантка Ланге',role:'аспирантка'},{name:'Декан Волошин',role:'декан'},{name:'Лаборант Песков',role:'лаборант'},{name:'Конкурентка Ершова',role:'коллега'},{name:'Ректор Миллер',role:'ректор'}],
+   motives:['Плагиат','Ревность','Грант','Месть','Сокрытие диссертации','Борьба за кафедру'],
+   methods:['Отравление в кофе','Падение с лестницы','Удар статуэткой','Подмена реагента','Несчастный случай в лаборатории','Удушение'],
+   places:['лаборатория 4','кафедра','библиотека','аудитория 12','кабинет декана','старая обсерватория'],
+   firms:['Стипендия','Грант','Фонд','Кафедра','Ректорат','Премия'],
+   photoPlaces:['на конференции в Тарту','на выпускном','на стажировке в Вене','в библиотеке']},
+  {id:'village',name:'Деревня Глухово',emoji:'🌾',desc:'Глухая деревня, старые тайны и недоверие к чужакам.',
+   suspects:[{name:'Староста Мороз',role:'староста'},{name:'Знахарка Аграфена',role:'знахарка'},{name:'Лесник Сыч',role:'лесник'},{name:'Кузнец Гуляй',role:'кузнец'},{name:'Торговка Вера',role:'торговка'},{name:'Сын Степан',role:'вернувшийся сын'}],
+   motives:['Земля','Кровная месть','Ревность','Наследство','Старая тайна','Суеверие'],
+   methods:['Отравленный отвар','Утопление в омуте','Удар топором','Удушение','Петля в лесу','Пропажа в болоте'],
+   places:['омут у мельницы','старый скит','колодец','амбар','дом старосты','кладбище'],
+   firms:['Артель','Скит','Мельница','Колодец','Глухово','Погост'],
+   photoPlaces:['на ярмарке в уезде','на старой мельнице','у скита','на речке']},
+  {id:'corp',name:'Корпорация «Синтек»',emoji:'💼',desc:'Стеклянный офис, большие деньги и очень много секретов.',
+   suspects:[{name:'СЕО Вагнер',role:'генеральный директор'},{name:'Финдир Орлова',role:'финансовый директор'},{name:'Безопасник Крылов',role:'начальник безопасности'},{name:'Разработчик Тао',role:'ведущий разработчик'},{name:'Юрист Ростов',role:'юрист'},{name:'Акционер Лунц',role:'акционер'}],
+   motives:['Утечка данных','Реванш','Долг','Слияние','Сокрытие скандала','Борьба за долю'],
+   methods:['Отравление в кофемашине','Удар в лифте','Падение с парковки','Электрический разряд','Подмена лекарства','ДТП'],
+   places:['кабинет СЕО на 30-м','серверная','паркинг −2','переговорная «Альфа»','лаборатория R&D','крыша бизнес-центра'],
+   firms:['Синтек','Инфра','Кодекс','Драйв','Атлас','Феникс'],
+   photoPlaces:['на корпоративе','на саммите в Сингапуре','на питче стартапа','в старом офисе на Тверской']}
+];
+
+const SL={fin:'Финансы',per:'Личное',cri:'Криминал'};
+const SC={fin:'#e0b14a',per:'#e06a9a',cri:'#6aa8e0'};
+
+function themeById(id){ return THEMES.find(t=>t.id===id)||THEMES[0]; }
+
+/* ============ BUILD CASE ============ */
+function buildCase(themeId,seed){
+  const th=themeById(themeId);
+  const r=makeRNG(seed);
+  const order=r.shuffle([0,1,2,3,4,5]);
+  const tS=th.suspects[order[0]], fS=th.suspects[order[1]], fS2=th.suspects[order[2]];
+  const tM=th.motives[r.int(6)]; const fM=th.motives.filter(x=>x!==tM)[r.int(5)];
+  const tK=th.methods[r.int(6)]; const fK=th.methods.filter(x=>x!==tK)[r.int(5)];
+  const tP=th.places[r.int(6)]; const fP=th.places.filter(x=>x!==tP)[r.int(5)];
+  const cards=[]; let id=0;
+  const C=(title,text,scale,kind='noise')=>cards.push({id:'c'+(id++),title,text,scale,kind});
+
+  C('Отпечаток',`На подоконнике в «${tP}» чёткий отпечаток. База даёт совпадение: ${tS.name}.`,'cri','anchor');
+  C('Записка',`В кармане жертвы записка: «Спросить у ${tS.name}». Почерк дрожащий.`,'per','anchor');
+  C('Заключение',`Эксперт уверен: причина смерти — ${tK.toLowerCase()}. Следов борьбы нет.`,'cri','anchor');
+  C('Место',`Ворс с ковра и капли воска совпадают: всё случилось в «${tP}».`,'cri','anchor');
+  C('Мотив',`Дневник жертвы: «${tM} — вот что нас всех связывает».`,(tM==='Долг'||tM==='Наследство'||tM==='Грант'||tM==='Земля'||tM==='Слияние'||tM==='Контрабанда')?'fin':'per','anchor');
+  C('Свидетель',`Свидетель твёрдо называет ${tS.name}. Говорит, что видел его у «${tP}» незадолго до полуночи.`,'cri','anchor');
+  C('Деталь',`Характерная деталь: ${tK.toLowerCase()}. Такого в этих краях не делал никто, кроме одного человека.`,'cri','anchor');
+  C('Ключ',`Ключ от «${tP}» был только у трёх. Двое алиби подтвердили. Третий — ${tS.name}.`,'cri','anchor');
+
+  C('Ложный след',`Свидетель уверяет, что видел ${fS.name} рядом с местом. Позже выяснилось: он путает даты.`,'cri','red');
+  C('Сплетня',`Кто-то шепнул, что причина — ${fM.toLowerCase()}. Слух ничем не подтверждён.`,'per','red');
+  C('Странность',`Сначала решили, что это ${fK.toLowerCase()}. Эксперт сомневается.`,'cri','red');
+  C('Не та дверь',`Следствие начало с «${fP}». Там всё чисто, даже пыль нетронута.`,'cri','red');
+  C('Похожий',`${fS2.name} в тот вечер был рядом. Но у него железное алиби — его видели пятеро.`,'cri','red');
+
+  C('Показания',`Сосед слышал спор около 23:40. Слов не разобрал, но голос был мужской.`,'cri');
+  C('Следы',`На полу в коридоре — следы мокрой обуви 42 размера.`,'cri');
+  C('Квитанция',`В мусоре чек из ломбарда на серебряные часы. Часы не найдены.`,'fin');
+  C('Сумма',`За день до случившегося кто-то перевёл крупную сумму на счёт неизвестной конторы.`,'fin');
+  C('Телефон',`14 пропущенных от контакта «Не брать». Все — между 22:00 и 23:30.`,'per');
+  C('Служебный вход',`Кто-то выходил через служебный вход после полуночи. Лица не видели.`,'cri');
+  C('Письмо',`Письмо без подписи: «Ты знаешь, за что». Бумага дорогая.`,'per');
+  C('Журнал',`В журнале выдачи медикаментов — запись: снотворное получили без назначения три дня назад.`,'cri');
+  C('Страховка',`Страховка оформлена за две недели до случившегося. Выгодоприобретатель скрыт.`,'fin');
+  C('Дневник',`Последняя запись в дневнике: «Он обещал, что это закончится».`,'per');
+  C('Наблюдение',`Запись наблюдения зафиксировала движение в 23:55. Лицо не разобрать.`,'cri');
+  C('Сейф',`Кто-то пытался подобрать код сейфа. Не вскрыт, но следы свежие.`,'fin');
+  C('Пепел',`Кто-то жёг бумаги в дальней комнате около трёх ночи. Пепел ещё тёплый.`,'cri');
+  C('Долг',`Жертва задолжала около миллиона. Кредитор не назван.`,'fin');
+  C('Отъезд',`Бывший партнёр жертвы уехал из города за день до случившегося.`,'per');
+  C('Чашки',`На столе две чашки. Одну аккуратно вымыли, вторая так и стоит.`,'cri');
+
+  const firmShuffle=r.shuffle(th.firms.slice());
+  const firmA=firmShuffle[0],firmB=firmShuffle[1],firmC=firmShuffle[2],firmD=firmShuffle[3];
+  const photoPlace=r.pick(th.photoPlaces);
+  const photoDistr=th.photoPlaces.filter(x=>x!==photoPlace).slice(0,3);
+
+  const branches={
+    fin:{title:'Долговая книга',
+      desc:'Деньги выходят на первый план. В колоду вмешиваются финансовые улики, а вы получаете право раз за акт подсмотреть верхнюю карту колоды.',
+      cards:[
+        {id:'b1',title:'Долговая книга',text:`В бумагах долговая книга. Одна строка обведена красным: ${tS.name}.`,scale:'fin',kind:'anchor'},
+        {id:'b2',title:'Подставная контора',text:`Контора «${firmA}» появилась за месяц до случившегося. Директор — подставное лицо.`,scale:'fin',kind:'anchor'},
+        {id:'b3',title:'Крупный перевод',text:`Бумаги показывают крупный перевод на «${firmA}» за час до случившегося.`,scale:'fin',kind:'anchor'}],
+      quiz:{q:'Какая контора стоит за деньгами?',correct:'«'+firmA+'»',pool:['«'+firmA+'»','«'+firmB+'»','«'+firmC+'»','«'+firmD+'»']}},
+    per:{title:'Старая связь',
+      desc:'На поверхность вылезает личное. В колоду вмешиваются улики об отношениях. Цена: каждая открытая «криминальная» улика в этом акте добавляет +1 к счётчику сброса.',
+      cards:[
+        {id:'b4',title:'Письмо с угрозой',text:`«Если ты не остановишься, я расскажу всем про ${tM.toLowerCase()}». Без подписи.`,scale:'per',kind:'anchor'},
+        {id:'b5',title:'Старое фото',text:`${tS.name} и жертва ${photoPlace}. На обороте: «Мы ещё вернёмся к этому».`,scale:'per',kind:'anchor'},
+        {id:'b6',title:'Дневник',text:`Запись: «Он не простит мне этого. И будет прав».`,scale:'per',kind:'anchor'}],
+      quiz:{q:'Где сделано старое фото?',correct:photoPlace,pool:[photoPlace,...photoDistr]}},
+    cri:{title:'Тёмный след',
+      desc:'Дело пахнет криминалом. В колоду вмешиваются улики про угрозы и взлом. Бонус: первый сброс в этом акте не считается.',
+      cards:[
+        {id:'b7',title:'Анонимный звонок',text:`За день до случившегося кто-то сообщил: «Проверьте ${tP}». Голос изменён.`,scale:'cri',kind:'anchor'},
+        {id:'b8',title:'Взлом',text:`На двери в «${tP}» — свежие следы взлома. Замок цел, но кто-то очень старался.`,scale:'cri',kind:'anchor'},
+        {id:'b9',title:'Запуганный свидетель',text:`Свидетель просит защиты. Говорит только одно: «${tS.name}. Больше ничего не скажу».`,scale:'cri',kind:'anchor'}],
+      quiz:{q:'Где именно произошло ключевое событие?',correct:'«'+tP+'»',pool:['«'+tP+'»',...th.places.filter(x=>x!==tP).slice(0,3).map(x=>'«'+x+'»')]}}
+  };
+
+  return {themeId:th.id,themeName:th.name,tS,fS,tM,fM,tK,fK,tP,fP,branches,deck:r.shuffle(cards)};
+}
+
+/* ============ STATE ============ */
+let G=null;
+let localView=null;
+let peer=null;
+let myConn=null;
+let hostConns=[];
+let myRole=null;
+let myPlayerIndex=0;
+
+const savedName=(typeof localStorage!=='undefined'&&localStorage.getItem('razvilka_name'))||'';
+let UI={screen:'setup',mode:null,theme:0,names:['Игрок 1','Игрок 2'],rulesOpen:false,tableOpen:false,sel:null,
+  roomCode:'',joinCode:'',myName:savedName,connecting:false,error:'',fromInvite:false};
+
+/* ============ HELPERS ============ */
+const $=id=>document.getElementById(id);
+const app=()=>document.getElementById('app');
+function toast(msg){
+  const t=$('toast'); t.textContent=msg; t.classList.add('on');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('on'),2200);
+}
+function genCode(){ return Math.random().toString(36).substring(2,6).toUpperCase(); }
+function drawTo(p){ while(p.hand.length<3 && G.deck.length>0) p.hand.push(G.deck.pop()); }
+function shuffleDeck(){
+  const r=makeRNG(G.seed+G.act*7777+G.discard*31);
+  G.deck=r.shuffle(G.deck);
+}
+function saveName(){ try{ if(UI.myName) localStorage.setItem('razvilka_name',UI.myName.trim()); }catch(_){} }
+function copyToClipboard(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast('Ссылка скопирована'),()=>fallbackCopy(text));
+  } else fallbackCopy(text);
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast('Ссылка скопирована'); }catch(_){ toast(text); }
+  document.body.removeChild(ta);
+}
+
+/* ============ GAME INIT ============ */
+function startGame(){
+  const th=THEMES[UI.theme];
+  const seed=(Date.now()^Math.floor(Math.random()*1e9))>>>0;
+  const t=buildCase(th.id,seed);
+  G.seed=seed; G.theme=th; G.truth=t;
+  G.deck=t.deck.slice();
+  G.revealed=[]; G.discard=0; G.discardFree=0;
+  G.act=1; G.actReveals=0; G.actTarget=Math.min(7,G.players.length+2);
+  G.scales={fin:0,per:0,cri:0};
+  G.turn=0; G.branches=[]; G.lastAction=null;
+  G.quiz=null; G.answers={}; G.checked=false; G.score=0;
+  G.peek=null; G.peekUsedAct=false;
+  G.players.forEach(p=>{ p.hand=[]; drawTo(p); });
+  G.phase=G.passAndPlay?'pass':'hand';
+  if(myRole==='solo'){ localView=makeView(G.turn); }
+  else if(myRole==='host'){ broadcast(); }
+}
+
+function makeView(pIdx){
+  const p=G.players[pIdx]||{hand:[]};
+  const cur=G.players[G.turn]||{name:'—'};
+  return {
+    code:G.code, themeId:G.theme?G.theme.id:'', themeEmoji:G.theme?G.theme.emoji:'', themeName:G.theme?G.theme.name:'',
+    players:G.players.map(x=>({name:x.name,isHost:x.isHost,connected:x.connected})),
+    you:pIdx, isHost:(pIdx===0&&myRole==='host')||myRole==='solo',
+    yourHand:p.hand, isYourTurn:G.turn===pIdx, turnName:cur.name,
+    deckCount:G.deck.length,
+    revealed:G.revealed, discard:G.discard, discardFree:G.discardFree,
+    act:G.act, actReveals:G.actReveals, actTarget:G.actTarget,
+    scales:G.scales, branches:G.branches, phase:G.phase, lastAction:G.lastAction,
+    quiz:G.quiz, answers:G.answers, checked:G.checked, score:G.score,
+    truth:G.checked?G.truth:null, peek:G.peek, peekUsedAct:G.peekUsedAct, passAndPlay:!!G.passAndPlay
+  };
+}
+
+/* ============ ACTIONS ============ */
+function submitAction(action){
+  if(myRole==='host'||myRole==='solo'){
+    handleAction(myRole==='solo'?G.turn:0, action);
+  } else if(myRole==='guest' && myConn && myConn.open){
+    myConn.send({type:'action',action});
+  }
+}
+function handleAction(pIdx, action){
+  if(!processAction(pIdx, action)) return;
+  if(myRole==='host') broadcast();
+  else { localView=makeView(G.turn); render(); }
+}
+function processAction(pIdx, action){
+  if(G.phase==='hand'){
+    if(G.turn!==pIdx) return false;
+    const p=G.players[pIdx];
+    if(action.type==='reveal'){
+      const card=p.hand[action.idx]; if(!card) return false;
+      p.hand.splice(action.idx,1);
+      G.revealed.push(card); G.scales[card.scale]++; G.actReveals++;
+      G.lastAction={type:'reveal',card};
+      if(G.branches.includes('per') && card.scale==='cri'){
+        if(G.discardFree>0){ G.discardFree--; G.lastAction.penalty='Штраф «Старой связи» погашен бонусом «Тёмного следа».'; }
+        else { G.discard++; G.lastAction.penalty='Штраф «Старой связи»: +1 к сбросу.'; }
+      }
+      G.phase='result'; return true;
+    }
+    if(action.type==='discard'){
+      const card=p.hand[action.idx]; if(!card) return false;
+      p.hand.splice(action.idx,1);
+      if(G.branches.includes('cri') && G.discardFree>0){ G.discardFree--; G.lastAction={type:'discardFree'}; }
+      else { G.discard++; G.lastAction={type:'discard'}; }
+      G.phase='result'; return true;
+    }
+    if(action.type==='peek' && G.branches.includes('fin') && !G.peekUsedAct){
+      if(G.deck.length===0) return false;
+      G.peekUsedAct=true; G.peek=G.deck[G.deck.length-1];
+      return true;
+    }
+  }
+  if(G.phase==='result' && action.type==='advance'){ advance(); return true; }
+  if(G.phase==='actEnd' && action.type==='advance'){ applyBranch(); return true; }
+  if(G.phase==='final' && (myRole==='host'||myRole==='solo')){
+    if(action.type==='answer' && !G.checked){ G.answers[action.q]=action.opt; return true; }
+    if(action.type==='check' && Object.keys(G.answers).length>=G.quiz.length){ checkFinal(); return true; }
+  }
+  if(G.phase==='pass' && action.type==='startHand'){ G.phase='hand'; return true; }
+  return false;
+}
+function advance(){
+  if(G.discard>=6){ G.phase='lose'; return; }
+  if(G.actReveals>=G.actTarget){
+    if(G.act===3){ startFinal(); return; }
+    G.phase='actEnd'; return;
+  }
+  G.turn=(G.turn+1)%G.players.length;
+  drawTo(G.players[G.turn]);
+  G.peek=null;
+  G.phase=G.passAndPlay?'pass':'hand';
+}
+function applyBranch(){
+  const dom=dominantScale();
+  const b=G.truth.branches[dom];
+  G.branches.push(dom); G.deck=G.deck.concat(b.cards);
+  if(dom==='cri') G.discardFree=1;
+  G.act++; G.actReveals=0; G.peekUsedAct=false; G.peek=null;
+  shuffleDeck();
+  G.turn=(G.turn+1)%G.players.length;
+  drawTo(G.players[G.turn]);
+  G.phase=G.passAndPlay?'pass':'hand';
+}
+function dominantScale(){
+  const s=G.scales;
+  if(s.fin>=s.per && s.fin>=s.cri) return 'fin';
+  if(s.per>=s.cri) return 'per';
+  return 'cri';
+}
+function startFinal(){
+  const r=makeRNG(G.seed+999);
+  const t=G.truth, th=G.theme;
+  const mk=(q,correct,pool)=>{
+    const others=pool.filter(x=>x!==correct);
+    const opts=r.shuffle([correct,...r.shuffle(others).slice(0,3)]);
+    return {q,correct,opts};
+  };
+  const qs=[
+    mk('Кто преступник?',t.tS.name,th.suspects.map(s=>s.name)),
+    mk('Какой мотив?',t.tM,th.motives),
+    mk('Каким способом?',t.tK,th.methods),
+    mk('Где произошло ключевое событие?','«'+t.tP+'»',th.places.map(p=>'«'+p+'»'))
+  ];
+  G.branches.forEach(b=>{ const bq=t.branches[b].quiz; qs.push(mk(bq.q,bq.correct,bq.pool)); });
+  G.quiz=qs; G.answers={}; G.checked=false; G.phase='final';
+}
+function checkFinal(){
+  let sc=0;
+  G.quiz.forEach((q,i)=>{ if(G.answers[i]===q.correct) sc++; });
+  G.score=sc; G.checked=true; G.phase='score';
+}
+
+/* ============ NETWORK ============ */
+function createRoomFixed(){
+  if(!UI.myName.trim()) return toast('Введите имя');
+  saveName();
+  UI.connecting=true; UI.error=''; render();
+  const code=genCode();
+  peer=new Peer('razv-'+code,{debug:1});
+  let opened=false;
+
+  peer.on('open',()=>{
+    opened=true; UI.connecting=false; myRole='host'; myPlayerIndex=0;
+    G={code,passAndPlay:false,
+       players:[{name:UI.myName.trim(),conn:null,isHost:true,hand:[],connected:true}],
+       theme:null,truth:null,deck:[],revealed:[],discard:0,discardFree:0,
+       act:1,actReveals:0,actTarget:3,scales:{fin:0,per:0,cri:0},turn:0,branches:[],
+       lastAction:null,phase:'lobby',quiz:null,answers:{},checked:false,score:0,peek:null,peekUsedAct:false};
+    UI.screen='lobby'; UI.roomCode=code;
+    localView=makeView(0);
+    render();
+  });
+  peer.on('connection',conn=>{
+    conn.on('data',data=>{
+      if(data.type==='join'){
+        if(!G||G.phase!=='lobby'){ conn.send({type:'error',msg:'Игра уже началась'}); return; }
+        if(G.players.length>=5){ conn.send({type:'error',msg:'Комната заполнена'}); return; }
+        const idx=G.players.length;
+        G.players.push({name:data.name||('Игрок '+(idx+1)),conn,isHost:false,hand:[],connected:true});
+        hostConns.push({conn,playerIndex:idx});
+        broadcast();
+      } else if(data.type==='action'){
+        const e=hostConns.find(h=>h.conn===conn);
+        if(e) handleAction(e.playerIndex,data.action);
+      }
+    });
+    conn.on('close',()=>{
+      const e=hostConns.find(h=>h.conn===conn);
+      if(e&&G.players[e.playerIndex]) G.players[e.playerIndex].connected=false;
+      hostConns=hostConns.filter(h=>h.conn!==conn);
+      broadcast();
+    });
+  });
+  peer.on('error',e=>{
+    if(!opened){ UI.connecting=false; UI.error='Не удалось: '+e.type; render(); }
+  });
+  setTimeout(()=>{ if(!opened){ UI.connecting=false; if(!UI.error) UI.error='Сервер не отвечает. Попробуйте ещё.'; render(); } },15000);
+}
+
+function joinRoom(){
+  if(!UI.joinCode.trim()) return toast('Введите код комнаты');
+  if(!UI.myName.trim()) return toast('Введите имя');
+  saveName();
+  UI.connecting=true; UI.error=''; render();
+  const code=UI.joinCode.trim().toUpperCase();
+  peer=new Peer({debug:1});
+  let opened=false, connected=false;
+
+  peer.on('open',()=>{
+    opened=true;
+    myConn=peer.connect('razv-'+code,{reliable:true,metadata:{name:UI.myName}});
+    myConn.on('open',()=>{
+      connected=true;
+      UI.connecting=false;
+      myConn.send({type:'join',name:UI.myName.trim()});
+    });
+    myConn.on('data',data=>{
+      if(data.type==='state'){
+        localView=data.view;
+        myPlayerIndex=data.view.you;
+        myRole='guest';
+        if(localView.phase==='lobby') UI.screen='lobby';
+        else UI.screen='game';
+        render();
+      } else if(data.type==='error'){
+        UI.connecting=false;
+        UI.error=data.msg||'Ошибка';
+        render();
+        try{ myConn.close(); }catch(_){}
+      }
+    });
+    myConn.on('close',()=>{
+      if(myRole==='guest'){ toast('Соединение с хостом потеряно'); resetToSetup(); }
+    });
+    myConn.on('error',()=>{
+      if(!connected){ UI.connecting=false; UI.error='Не удалось подключиться. Проверьте код.'; render(); }
+    });
+  });
+  peer.on('error',e=>{
+    UI.connecting=false;
+    if(e.type==='peer-unavailable') UI.error='Комната с таким кодом не найдена.';
+    else UI.error='Ошибка соединения: '+e.type;
+    render();
+  });
+  setTimeout(()=>{ if(!connected){ UI.connecting=false; if(!UI.error) UI.error='Не удалось подключиться. Попробуйте ещё.'; render(); } },15000);
+}
+
+function broadcast(){
+  if(myRole!=='host') return;
+  localView=makeView(0);
+  G.players.forEach((p,i)=>{
+    if(i===0) return;
+    if(p.conn && p.connected && p.conn.open){
+      try{ p.conn.send({type:'state',view:makeView(i)}); }catch(_){}
+    }
+  });
+  render();
+}
+
+function resetToSetup(){
+  try{ if(peer) peer.destroy(); }catch(_){}
+  peer=null; myConn=null; hostConns=[]; G=null; localView=null;
+  myRole=null; myPlayerIndex=0;
+  UI={screen:'setup',mode:null,theme:0,names:['Игрок 1','Игрок 2'],rulesOpen:false,tableOpen:false,sel:null,
+    roomCode:'',joinCode:'',myName:savedName,connecting:false,error:'',fromInvite:false};
+  render();
+}
+
+/* ============ SOLO ============ */
+function startSolo(){
+  const names=UI.names.map((n,i)=>n.trim()||('Игрок '+(i+1)));
+  if(names.length<1||names.length>5) return toast('1–5 игроков');
+  myRole='solo';
+  G={code:null,passAndPlay:true,
+     players:names.map(n=>({name:n,conn:null,isHost:false,hand:[],connected:true})),
+     theme:null,truth:null,deck:[],revealed:[],discard:0,discardFree:0,
+     act:1,actReveals:0,actTarget:3,scales:{fin:0,per:0,cri:0},turn:0,branches:[],
+     lastAction:null,phase:'hand',quiz:null,answers:{},checked:false,score:0,peek:null,peekUsedAct:false};
+  UI.screen='game';
+  startGame();
+}
+
+/* ============ QR ============ */
+function getJoinUrl(){
+  if(!UI.roomCode) return '';
+  const base=window.location.origin+window.location.pathname;
+  return base+'?room='+UI.roomCode;
+}
+function initQR(){
+  const el=document.getElementById('qr-box');
+  if(!el) return;
+  const url=getJoinUrl();
+  if(!url) return;
+  el.innerHTML='';
+  if(typeof QRCode==='undefined'){
+    el.innerHTML='<div style="color:#333;padding:20px;text-align:center;font-size:13px">QR-библиотека не загрузилась.<br>Скопируйте ссылку ниже.</div>';
+    return;
+  }
+  try{
+    new QRCode(el,{text:url,width:220,height:220,colorDark:'#0e1116',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+  }catch(err){
+    el.innerHTML='<div style="color:#333;padding:20px;text-align:center;font-size:13px">Ошибка QR</div>';
+  }
+}
+
+/* ============ RENDER ============ */
+function render(){
+  let h='';
+  if(UI.screen==='setup') h=renderSetup();
+  else if(UI.screen==='lobby') h=renderLobby();
+  else if(UI.screen==='game') h=renderGame();
+  if(UI.rulesOpen) h+=renderRules();
+  if(UI.tableOpen && localView && localView.phase!=='lobby') h+=renderTable();
+  app().innerHTML=h;
+  if(UI.screen==='lobby' && myRole==='host') initQR();
+}
+
+function renderSetup(){
+  if(UI.mode===null){
+    return `<h1>Развилка</h1>
+    <div class="sub">Кооперативный детектив с ветвящимся сюжетом. Выберите режим.</div>
+    <button class="btn mode-btn" onclick="UI.mode='online';render()">
+      <span class="icon">📱</span>
+      <span><b>Онлайн-комната</b><br><span style="font-size:13px;color:#a8b4c4;font-weight:400">Каждый со своего телефона. Создайте комнату или войдите по коду или QR.</span></span>
+    </button>
+    <button class="btn mode-btn" onclick="UI.mode='solo';render()">
+      <span class="icon">📞</span>
+      <span><b>Один телефон</b><br><span style="font-size:13px;color:#a8b4c4;font-weight:400">Играйте компанией на одном устройстве, передавая его по кругу.</span></span>
+    </button>
+    <button class="btn ghost" onclick="UI.rulesOpen=true;render()">Правила</button>`;
+  }
+  if(UI.mode==='online'){
+    if(UI.error) return `<h1>Онлайн</h1><div class="sub" style="color:#e07a6a">${UI.error}</div>
+      <button class="btn primary" onclick="UI.error='';UI.fromInvite=false;UI.joinCode='';render()">Попробовать снова</button>
+      <button class="btn ghost" onclick="UI.mode=null;UI.error='';render()">← Назад</button>`;
+    if(UI.connecting) return `<h1>Онлайн</h1><div class="center" style="padding:60px 0"><div class="spinner"></div><div class="sub" style="margin-top:20px">Подключение к серверу…</div></div>`;
+
+    if(UI.fromInvite){
+      return `<h1>Вас пригласили</h1>
+      <div class="invite-card">
+        <div style="font-size:13px;color:#8b97a8;text-transform:uppercase;letter-spacing:1px">Комната</div>
+        <div class="code">${UI.joinCode}</div>
+        <div style="font-size:13px;color:#8b97a8">Осталось только войти</div>
+      </div>
+      <h2>Ваше имя</h2>
+      <input class="inp" value="${UI.myName||''}" oninput="UI.myName=this.value" placeholder="Имя">
+      <button class="btn primary" onclick="joinRoom()">Войти в комнату</button>
+      <button class="btn ghost" onclick="UI.fromInvite=false;UI.joinCode='';render()">← Не сейчас</button>`;
+    }
+
+    return `<h1>Онлайн</h1>
+    <div class="sub">Создайте комнату или войдите по коду.</div>
+    <h2>Создать комнату</h2>
+    <input class="inp" value="${UI.myName||''}" oninput="UI.myName=this.value" placeholder="Ваше имя">
+    <button class="btn primary" onclick="createRoomFixed()">Создать комнату</button>
+    <h2 style="margin-top:26px">Войти по коду</h2>
+    <input class="inp" value="${UI.joinCode||''}" oninput="UI.joinCode=this.value.toUpperCase()" placeholder="Например, AB12" maxlength="4" style="letter-spacing:4px;text-align:center;font-size:20px;font-weight:700">
+    <input class="inp" value="${UI.myName||''}" oninput="UI.myName=this.value" placeholder="Ваше имя">
+    <button class="btn primary" onclick="joinRoom()">Войти</button>
+    <button class="btn ghost" onclick="UI.mode=null;render()">← Назад</button>`;
+  }
+  return `<h1>Один телефон</h1>
+  <div class="sub">Игроки передают телефон по кругу. Каждый видит только свою руку.</div>
+  <h2>Выберите дело</h2>
+  <div class="theme-hero">${svgThemeScene(THEMES[UI.theme].id)}</div>
+  ${THEMES.map((t,i)=>`<button class="opt ${UI.theme===i?'sel':''}" onclick="UI.theme=${i};render()">
+    <div class="opt-thumb">${svgThemeScene(t.id)}</div>
+    <div class="opt-col">
+      <b>${t.emoji} ${t.name}</b>
+      <span style="font-size:13px;color:#8b97a8;line-height:1.4;margin-top:2px">${t.desc}</span>
+    </div>
+  </button>`).join('')}
+  <h2 style="margin-top:26px">Игроки</h2>
+  ${UI.names.map((n,i)=>`<input class="inp" value="${n}" oninput="UI.names[${i}]=this.value" placeholder="Имя">`).join('')}
+  <button class="btn ghost" onclick="UI.names.push('Игрок '+(UI.names.length+1));render()">+ Добавить</button>
+  ${UI.names.length>1?`<button class="btn ghost" onclick="UI.names.pop();render()">− Убрать</button>`:''}
+  <button class="btn primary" onclick="startSolo()">Начать</button>
+  <button class="btn ghost" onclick="UI.mode=null;render()">← Назад</button>`;
+}
+
+function renderLobby(){
+  if(!localView) return '';
+  const isHost=localView.isHost;
+  const players=localView.players;
+  const canStart=players.length>=1;
+  const joinUrl=getJoinUrl();
+  const th=THEMES[UI.theme];
+
+  return `<h1>Комната</h1>
+  <div class="sub">${isHost?'Пусть друзья отсканируют QR камерой телефона — игра откроется сама.':'Вы в комнате. Ждём старта от хоста.'}</div>
+  <div class="code-big">${UI.roomCode||localView.code||'----'}</div>
+  ${isHost?`
+    <div id="qr-box"></div>
+    <div class="qr-hint">Наведите камеру телефона на QR — игра откроется с уже введённым кодом</div>
+    <button class="btn ghost" onclick="copyToClipboard('${joinUrl.replace(/'/g,"\\'")}')">Скопировать ссылку</button>
+  `:''}
+  <h2 style="margin-top:24px">Игроки (${players.length}/5)</h2>
+  ${players.map((p,i)=>`<div class="player-row">
+    ${svgPortrait(p.name, th.id, 32)}
+    <span class="nm">${p.name}${i===localView.you?' <span class="you-badge">вы</span>':''}</span>
+    <span class="dot ${p.connected?'':'off'}"></span>
+    ${p.isHost?'<span class="host-badge">хост</span>':''}
+  </div>`).join('')}
+  <h2 style="margin-top:26px">Дело</h2>
+  <div class="theme-hero">${svgThemeScene(th.id)}</div>
+  ${isHost
+    ? THEMES.map((t,i)=>`<button class="opt ${UI.theme===i?'sel':''}" onclick="UI.theme=${i};render()">
+        <div class="opt-thumb">${svgThemeScene(t.id)}</div>
+        <div class="opt-col">
+          <b>${t.emoji} ${t.name}</b>
+          <span style="font-size:13px;color:#8b97a8;line-height:1.4;margin-top:2px">${t.desc}</span>
+        </div>
+      </button>`).join('')
+    : `<div class="card"><div class="ttl">Тема</div><div class="txt">${th.emoji} ${th.name}</div></div>`}
+  ${isHost?`<button class="btn primary" style="margin-top:20px" ${canStart?'':'disabled'} onclick="hostStart()">Начать игру</button>`:
+    '<div class="center sub" style="margin-top:26px">Ждём хоста…</div>'}
+  <button class="btn ghost" style="margin-top:14px" onclick="if(confirm('Выйти из комнаты?'))resetToSetup()">Выйти</button>`;
+}
+
+function hostStart(){
+  if(!G||G.phase!=='lobby') return;
+  startGame();
+  broadcast();
+}
+
+function renderGame(){
+  if(!localView) return '';
+  const v=localView;
+  if(v.phase==='lose') return renderLose();
+  if(v.phase==='score') return renderScore();
+  if(v.phase==='final') return renderFinal();
+  if(v.phase==='actEnd') return renderActEnd();
+  if(v.phase==='pass') return renderPass();
+  if(v.phase==='hand') return renderHand();
+  if(v.phase==='result') return renderResult();
+  return '';
+}
+
+function header(){
+  const v=localView;
+  return `<div class="hdr">
+    <span class="pill">${v.themeEmoji} ${v.themeName}</span>
+    <span class="sp"></span>
+    <span class="pill">Акт ${v.act}/3</span>
+    <span class="pill">${v.actReveals}/${v.actTarget}</span>
+    <span class="pill" style="color:${v.discard>=5?'#e07a6a':'#8b97a8'}">Сброс ${v.discard}/6</span>
+    <span class="pill" onclick="UI.tableOpen=true;render()" style="cursor:pointer">Стол</span>
+  </div>`;
+}
+
+function cardHTML(c,sel,onclick){
+  return `<div class="card ${sel?'sel':''}" ${onclick?`onclick="${onclick}"`:''}>
+    <div class="card-row">
+      <div class="card-icon">${svgCardIllustration(c)}</div>
+      <div class="card-body">
+        <div class="ttl">${c.title}</div>
+        <div class="txt">${c.text}</div>
+        <span class="tag" style="background:${SC[c.scale]}22;color:${SC[c.scale]}">${SL[c.scale]}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderPass(){
+  const v=localView;
+  return header()+`<div class="big">Передай телефон</div>
+  <div class="center" style="font-size:18px;color:#e8ecf1;margin:30px 0">${v.turnName}</div>
+  <div class="center sub">Улики в твоей руке видишь только ты.</div>
+  <button class="btn primary" style="margin-top:30px" onclick="submitAction({type:'startHand'})">Я ${v.turnName}</button>
+  ${v.peek?`<div class="card" style="border-color:#3d7eff"><div class="card-row"><div class="card-icon">${svgCardIllustration(v.peek)}</div><div class="card-body"><div class="ttl">Подсмотрено</div><div class="txt">${v.peek.title}: ${v.peek.text}</div></div></div></div>`:''}`;
+}
+
+function renderHand(){
+  const v=localView;
+  const canPeek=v.branches.includes('fin') && !v.peekUsedAct;
+  if(!v.isYourTurn){
+    return header()+`<h2>Сейчас ходит ${v.turnName}</h2>
+    <div class="sub">Дождитесь своей очереди.</div>
+    <div class="card" style="opacity:.5">
+      <div class="card-row">
+        <div class="card-icon">${svgIcon('magnifier','#5a6678')}</div>
+        <div class="card-body">
+          <div class="ttl">Ваши улики (${v.yourHand.length})</div>
+          <div class="txt">${v.yourHand.map(c=>'• '+c.title).join('<br>')}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  return header()+`<h2>${v.players[v.you].name}, твой ход</h2>
+  <div class="sub">Открыть карту — все увидят. Сбросить — втёмную.</div>
+  ${v.yourHand.map((c,i)=>cardHTML(c,UI.sel===i,`UI.sel=${i};render()`)).join('')}
+  <button class="btn primary" ${UI.sel===null?'disabled':''} onclick="submitAction({type:'reveal',idx:UI.sel});UI.sel=null">Открыть</button>
+  <button class="btn danger" ${UI.sel===null?'disabled':''} onclick="submitAction({type:'discard',idx:UI.sel});UI.sel=null">Сбросить втёмную</button>
+  <button class="btn ghost" onclick="submitAction({type:'peek'})" ${canPeek?'':'disabled'}>${canPeek?'Подсмотреть верхнюю карту (1 раз за акт)':'Подсмотр недоступен'}</button>`;
+}
+
+function renderResult(){
+  const v=localView;
+  const a=v.lastAction;
+  const isActioner=(v.passAndPlay)?true:v.isYourTurn;
+  if(!a) return header()+'<div class="sub">Загрузка…</div>';
+  if(a.type==='discard'||a.type==='discardFree'){
+    const free=a.type==='discardFree';
+    return header()+`<div class="big">Карта сброшена</div>
+    <div class="center sub">${free?'Бонус «Тёмного следа»: сброс не считается.':'Карта ушла втёмную.'}</div>
+    <div class="scale">
+      <div><div class="n" style="color:#e07a6a">${v.discard}</div><div class="l">Сброс</div></div>
+      <div><div class="n">${v.discard>=6?0:6-v.discard}</div><div class="l">До провала</div></div>
+    </div>
+    ${isActioner?`<button class="btn primary" style="margin-top:30px" onclick="submitAction({type:'advance'})">Дальше</button>`:'<div class="center sub" style="margin-top:26px">Ждём '+v.turnName+'…</div>'}`;
+  }
+  return header()+`<div class="big">Улика на столе</div>
+  ${cardHTML(a.card,false)}
+  ${a.penalty?`<div class="card" style="border-color:#c0392b"><div class="txt">⚠ ${a.penalty}</div></div>`:''}
+  <div class="scale">
+    <div><div class="n" style="color:${SC.fin}">${v.scales.fin}</div><div class="l">Финансы</div></div>
+    <div><div class="n" style="color:${SC.per}">${v.scales.per}</div><div class="l">Личное</div></div>
+    <div><div class="n" style="color:${SC.cri}">${v.scales.cri}</div><div class="l">Криминал</div></div>
+  </div>
+  ${isActioner?`<button class="btn primary" style="margin-top:20px" onclick="submitAction({type:'advance'})">Дальше</button>`:'<div class="center sub" style="margin-top:26px">Ждём '+v.turnName+'…</div>'}`;
+}
+
+function renderActEnd(){
+  const v=localView;
+  const dom=dominantScaleFrom(v.scales);
+  const b={fin:'Долговая книга',per:'Старая связь',cri:'Тёмный след'}[dom];
+  const desc={fin:'Деньги выходят на первый план. Раз за акт можно подсмотреть верхнюю карту колоды.',
+    per:'Личное вылезает наружу. Каждая открытая «криминальная» улика добавляет +1 к сбросу.',
+    cri:'Криминал на первом плане. Первый сброс в акте не считается.'}[dom];
+  return header()+`<div class="big">Акт ${v.act} завершён</div>
+  <div class="center sub">Перевес на шкале <b style="color:${SC[dom]}">${SL[dom]}</b>.</div>
+  <div class="card" style="border-color:${SC[dom]}">
+    <div class="ttl">Новая линия</div>
+    <div class="txt" style="font-size:18px;font-weight:700;margin-bottom:8px">${b}</div>
+    <div class="txt" style="font-size:14px;color:#a8b4c4">${desc}</div>
+  </div>
+  ${v.isYourTurn?`<button class="btn primary" style="margin-top:20px" onclick="submitAction({type:'advance'})">Продолжить</button>`:'<div class="center sub" style="margin-top:26px">Ждём '+v.turnName+'…</div>'}`;
+}
+function dominantScaleFrom(s){
+  if(s.fin>=s.per && s.fin>=s.cri) return 'fin';
+  if(s.per>=s.cri) return 'per';
+  return 'cri';
+}
+
+function renderFinal(){
+  const v=localView;
+  const canAnswer=(myRole==='host'||myRole==='solo');
+  const allAnswered=Object.keys(v.answers).length===v.quiz.length;
+  const th=themeById(v.themeId);
+  return header()+`<h1>Финал</h1>
+  <div class="sub">${canAnswer?'Обсудите вслух и выберите ответы.':'Хост вводит ответы. Обсудите вслух.'}</div>
+  ${v.quiz.map((q,i)=>`
+    <div class="q">${i+1}. ${q.q}</div>
+    ${q.opts.map(o=>{
+      let cls='opt';
+      if(v.answers[i]===o) cls+=' sel';
+      const esc=o.replace(/"/g,'&quot;').replace(/'/g,"\\'");
+      const isSuspect=th.suspects.some(s=>s.name===o);
+      const portrait=isSuspect?svgPortrait(o,v.themeId,32):'';
+      return `<button class="${cls}" ${!canAnswer?'disabled':''} onclick="submitAction({type:'answer',q:${i},opt:'${esc}'})">${portrait}<span>${o}</span></button>`;
+    }).join('')}
+  `).join('')}
+  ${canAnswer?`<button class="btn primary" style="margin-top:26px" ${allAnswered?'':'disabled'} onclick="submitAction({type:'check'})">Вскрыть конверт</button>`:
+    `<div class="center sub" style="margin-top:26px">Ждём, пока хост ответит на все вопросы…</div>`}`;
+}
+
+function renderScore(){
+  const v=localView;
+  const t=v.truth;
+  const n=v.score, tot=v.quiz.length;
+  let verdict,emoji;
+  if(n===tot){verdict='Идеально. Дело закрыто.';emoji='🏆';}
+  else if(n>=tot-1){verdict='Убедительная победа.';emoji='🎉';}
+  else if(n>=Math.ceil(tot*0.66)){verdict='Дело раскрыто частично.';emoji='🕵️';}
+  else {verdict='Дело ушло в архив нераскрытым.';emoji='📁';}
+  return header()+`<div class="win">${emoji}</div>
+  <div class="center" style="font-size:22px;font-weight:700">${n} из ${tot}</div>
+  <div class="center sub">${verdict}</div>
+  ${t?`<div class="card" style="border-color:#3d7eff">
+    <div class="ttl">Истина · ${v.themeName}</div>
+    <div class="truth-portrait">
+      ${svgPortrait(t.tS.name,v.themeId,64)}
+      <div class="info">
+        <div style="font-weight:700;font-size:17px;margin-bottom:4px">${t.tS.name}</div>
+        <div style="font-size:13px;color:#a8b4c4;line-height:1.5">
+          <b>Мотив:</b> ${t.tM}<br>
+          <b>Способ:</b> ${t.tK}<br>
+          <b>Место:</b> ${t.tP}
+        </div>
+      </div>
+    </div>
+  </div>`:''}
+  <button class="btn primary" style="margin-top:20px" onclick="resetToSetup()">Новое дело</button>`;
+}
+
+function renderLose(){
+  return header()+`<div class="win">💀</div>
+  <div class="big">Дело провалено</div>
+  <div class="center sub">Слишком много улик ушло втёмную.</div>
+  <button class="btn primary" style="margin-top:30px" onclick="resetToSetup()">Заново</button>`;
+}
+
+function renderTable(){
+  const v=localView;
+  return `<div class="modal" onclick="if(event.target===this){UI.tableOpen=false;render()}">
+    <div class="inner">
+      <h2>Стол</h2>
+      <div class="scale">
+        <div><div class="n" style="color:${SC.fin}">${v.scales.fin}</div><div class="l">Финансы</div></div>
+        <div><div class="n" style="color:${SC.per}">${v.scales.per}</div><div class="l">Личное</div></div>
+        <div><div class="n" style="color:${SC.cri}">${v.scales.cri}</div><div class="l">Криминал</div></div>
+      </div>
+      <div class="card"><div class="ttl">Сброс</div><div class="txt">${v.discard} из 6</div></div>
+      ${v.revealed.length===0?'<div class="sub" style="margin-top:20px">Пока пусто.</div>':
+        v.revealed.map(c=>`<div class="mcard" style="border-left-color:${SC[c.scale]}">
+          <div class="card-icon" style="width:36px;height:36px;border-radius:8px">${svgIcon(cardIconKind(c),SC[c.scale])}</div>
+          <div class="mcard-body"><b>${c.title}.</b> ${c.text}</div>
+        </div>`).join('')}
+      <button class="btn primary" style="margin-top:20px" onclick="UI.tableOpen=false;render()">Закрыть</button>
+    </div>
+  </div>`;
+}
+
+function renderRules(){
+  return `<div class="modal" onclick="if(event.target===this){UI.rulesOpen=false;render()}">
+    <div class="inner">
+      <h2>Правила</h2>
+      <div class="sub" style="line-height:1.7">
+        <b>Режимы.</b> «Онлайн-комната» — каждый со своего телефона. «Один телефон» — все на одном устройстве.<br><br>
+        <b>QR.</b> Хост создаёт комнату и показывает QR. Друзья сканируют его камерой.<br><br>
+        <b>Цель.</b> Командой раскрыть дело: кто, зачем, как и где.<br><br>
+        <b>Ход.</b> В свой ход выбери одну карту из руки:<br>
+        • <b>Открыть</b> — все увидят, шкала +1.<br>
+        • <b>Сбросить</b> — втёмную, никто не узнает.<br><br>
+        <b>Провал.</b> 6 сбросов — проигрыш.<br><br>
+        <b>Акты.</b> Их три. В конце акта доминирующая шкала выбирает сюжетную линию.<br><br>
+        <b>Финал.</b> 4 вопроса + по вопросу за каждую пройденную ветку.
+      </div>
+      <button class="btn primary" style="margin-top:24px" onclick="UI.rulesOpen=false;render()">Понятно</button>
+    </div>
+  </div>`;
+}
+
+/* ============ INIT ============ */
+(function initFromUrl(){
+  try{
+    const params=new URLSearchParams(window.location.search);
+    const room=(params.get('room')||'').toUpperCase();
+    if(room && room.length===4){
+      UI.mode='online'; UI.joinCode=room; UI.fromInvite=true;
+      try{ window.history.replaceState({},'',window.location.pathname); }catch(_){}
+    }
+  }catch(_){}
+})();
+
+render();
+</script>
+</body>
+</html>
